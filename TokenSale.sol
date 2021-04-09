@@ -103,21 +103,21 @@ contract TokenSale {
   // raised by the token sale. Added as "wallet address"
   // 50% will go to the liquidity pool for CEX/DEX 
   //
-  address payable public liquidityFundAddress = 0x4053284F7bA7Ac7DF52DBBc12b42e6Fa2956Bba1;
+  address payable public liquidityFundAddress = 0xFF3c2E48dE1C8801337a16fE7944b4b5Df20A2cC;
   //
   /////////////////////////////////////////////////////////////////////////////////////
   
   ////////////////////////////////////////////////////////////////////////////////////
   // address of investment fund wallet, used to develop and promote the project
   // 40% will go to this wallet
-  address payable public investmentFundAddress = 0x77a0732111e426a68064d7f34B812a0E5D317d9c;
+  address payable public investmentFundAddress = 0x4053284F7bA7Ac7DF52DBBc12b42e6Fa2956Bba1;
   //
   /////////////////////////////////////////////////////////////////////////////////////
   
   ////////////////////////////////////////////////////////////////////////////////////
   // address of time-locked team fund wallet
   //
-  address payable public teamFundAddress = 0xfB5136361ab5faB28E602EA868909828d2ce23ca;
+  address payable public teamFundAddress = 0xF3E8352bacB923FA385Bf34C61B92cC94515a57a;
   //
   /////////////////////////////////////////////////////////////////////////////////////
   
