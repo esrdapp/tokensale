@@ -1,8 +1,8 @@
 // ESR - Team ESR Tokens time-locked smart contract
 //
 // The following contract offers peace of mind to investors as the
-// Tokens that will go to the members of the ESR team
-// will be time-locked whereby ESR cannot be withdrawn
+// ESR Tokens and HPB that will go to the members of the ESR team
+// will be time-locked whereby Neither HPB and ESR tokens cannot be withdrawn
 // from the smart contract for a minimum of 3 months, until at least 19th July 2021
 //
 // Withdraw functions can only be called when the current timestamp is 
@@ -87,7 +87,7 @@ event transferred(uint256 _value);
 // Main contract
 //////////////////////////////////////////////////////////////////////////////
 
-contract TeamTokens {
+contract TeamFunds {
     using SafeMath for uint256;
 
     address public thisContractAddress;
@@ -143,8 +143,9 @@ contract TeamTokens {
     }
     
     
-    // function to withdraw any HPB that were accidentally sent to this contract address
+    // withdraw HPB after the unlock date
     function devWithdrawHPB(uint256 _amount) public payable {
+        require(now >= unlockDate);
         require (admin == msg.sender);
         address(msg.sender).transfer(_amount);
     }
