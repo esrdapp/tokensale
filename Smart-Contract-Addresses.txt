@@ -1,1 +1,8 @@
+Token Sale Smart Contract Address - TBC
+Team ESR Tokens (Time-locked) smart contract Address - TBC
+Team HPB Coins (Time-locked till 19th July 2021) smart contract Address - 0x5624b61cf6c796e1991c8071d993fe621bb8e12f
+Investment/Development funds Wallet Address for HPB - TBC
+CEX/DEX liquidity pool Address for HPB and ESR - TBC
+
+
 TokenBurn Address - 0x30171d518E3627E2006C9645d63e2a0A60F50f99
