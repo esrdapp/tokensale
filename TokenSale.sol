@@ -6,7 +6,7 @@
 // this is a PUBLIC function that anyone can call!!
 //
 // All HPB raised during the token sale is automatically sent to the 
-// HPBRaised wallet for project distribution
+// relevant HPB contracts and wallets for project distribution
 
 
 pragma solidity ^0.5.6;
