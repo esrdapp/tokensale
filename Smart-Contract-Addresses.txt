@@ -1,7 +1,6 @@
-Token Sale Smart Contract Address - TBC
+Token Sale Smart Contract Address - 0xab6b4a5afe50b35b5e43886604fd497f0dec6f2e
 Team Funds (Time-locked) smart contract Address - 0xf3e8352bacb923fa385bf34c61b92cc94515a57a
-Investment/Development funds Wallet Address for HPB - TBC
-CEX/DEX liquidity pool Address for HPB and ESR - TBC
-
+Investment/Development funds Wallet Address for HPB - 0x4053284F7bA7Ac7DF52DBBc12b42e6Fa2956Bba1
+CEX/DEX liquidity pool Address for HPB and ESR - 0xFF3c2E48dE1C8801337a16fE7944b4b5Df20A2cC
 
 TokenBurn Address - 0x30171d518E3627E2006C9645d63e2a0A60F50f99
