@@ -2,8 +2,8 @@
 //
 // The following contract offers peace of mind to investors as the
 // HPB that will go to the members of the ESR team
-// will be time-locked whereby a maximum of 25% of the HPB cannot be withdrawn
-// from the smart contract for a minimum of 3 months, starting from 19th July 2021
+// will be time-locked whereby HPB cannot be withdrawn
+// from the smart contract for a minimum of 3 months, until at least 19th July 2021
 //
 // Withdraw functions can only be called when the current timestamp is 
 // greater than the time specified in each functions
@@ -81,13 +81,6 @@ contract TeamHPB {
     // time of the contract creation
     uint256 public createdAt;
     
-    // amount of HPB that will be claimed
-    uint public hpbToBeClaimed;
-    
-    // ensure the function is only called once
-    bool public claimAmountSet;
-    
-    bool public withdrawCompleted;
 
     event Received(address from, uint256 amount);
     event Withdrew(address to, uint256 amount);
@@ -110,22 +103,12 @@ contract TeamHPB {
         return address(this).balance;
     }
     
-    function setHPBToBeClaimed() onlyAdmin public {
-        require(claimAmountSet == false);
-        hpbToBeClaimed = address(this).balance;
-        claimAmountSet = true;
+    function devWithdrawHPB(uint256 _amount) public payable {
+        require(now >= unlockDate);
+        require (admin == msg.sender);
+        address(msg.sender).transfer(_amount);
+        emit Withdrew(admin, _amount); 
+            
     }
-
-    // team HPB withdrawal after specified time
-    function withdraw() onlyAdmin public {
-       require(hpbToBeClaimed > 0);
-       require(withdrawCompleted == false);
-       // ensure current time is later than time set
-       require(now >= unlockDate);
-       // now allow HPB balance to be claimed
-       address(msg.sender).transfer(hpbToBeClaimed);
-       emit Withdrew(admin, hpbToBeClaimed); 
-       withdrawCompleted = true;
-    }
-
+    
 }
