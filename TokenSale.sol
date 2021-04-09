@@ -2,11 +2,11 @@
 // 16.04.21
 //
 // Any unsold tokens can be sent directly to the TokenBurn Contract
-// by ANYBODY once the Token Sale is complete - 
+// by anybody once the Token Sale is complete - 
 // this is a PUBLIC function that anyone can call!!
 //
 // All HPB raised during the token sale is automatically sent to the 
-// "HPBRaised" smart contract for project distribution
+// HPBRaised wallet for project distribution
 
 
 pragma solidity ^0.5.6;
@@ -85,16 +85,49 @@ contract TokenSale {
   address public admin;
   address public thisContractAddress;
 
-  // address of the ESR token original smart contract (http://hpbscan.org/HRC20/0xa7be5e053cb523585a63f8f78b7dbca68647442f)
+  //////////////////////////////////////////////////////////////////////////////////
+  // address of the ESR token original smart contract
   address public tokenContractAddress = 0xa7Be5e053cb523585A63F8F78b7DbcA68647442F;
+  //
+  //////////////////////////////////////////////////////////////////////////////////
   
+  /////////////////////////////////////////////////////////////////////////////////////
   // address of TokenBurn contract to "burn" unsold tokens
   // for further details, review the TokenBurn contract and verify code on MyHPBwallet
   address public tokenBurnAddress = 0x30171d518E3627E2006C9645d63e2a0A60F50f99;
+  //
+  /////////////////////////////////////////////////////////////////////////////////////
   
-  // address of HPBRaised contract, that will be used to distribute funds 
+  ////////////////////////////////////////////////////////////////////////////////////
+  // address of liquidity wallet, that will be used to distribute funds 
   // raised by the token sale. Added as "wallet address"
-  address payable public hpbRaisedAddress = 0xF8aDC8f416C456AEb38917DFCe870fB7C38cF37C;
+  // 50% will go to the liquidity pool for CEX/DEX 
+  //
+  address payable public liquidityFundAddress = 0x4053284F7bA7Ac7DF52DBBc12b42e6Fa2956Bba1;
+  //
+  /////////////////////////////////////////////////////////////////////////////////////
+  
+  ////////////////////////////////////////////////////////////////////////////////////
+  // address of investment fund wallet, used to develop and promote the project
+  // 40% will go to this wallet
+  address payable public investmentFundAddress = 0x77a0732111e426a68064d7f34B812a0E5D317d9c;
+  //
+  /////////////////////////////////////////////////////////////////////////////////////
+  
+  ////////////////////////////////////////////////////////////////////////////////////
+  // address of time-locked team fund wallet
+  //
+  address payable public teamFundAddress = 0xfB5136361ab5faB28E602EA868909828d2ce23ca;
+  //
+  /////////////////////////////////////////////////////////////////////////////////////
+  
+  // starting time and closing time of ESR token sale
+  // scheduled start on Friday, April 16th 2021 at 09:00am GMT
+  // (1618563600) - https://www.epochconverter.com/
+  uint public openingTime = 1618563600;
+  uint public closingTime = openingTime.add(5 days);
+  
+  
   
   uint public preIcoPhaseCountdown;       // used for website tokensale
   uint public icoPhaseCountdown;          // used for website tokensale
@@ -124,10 +157,7 @@ contract TokenSale {
   // means maximum Wei raised would be maxHPBRaised * 1000000000000000000
   uint public maxWeiRaised = maxHPBRaised.mul(1000000000000000000);
 
-  // starting time and closing time of Crowdsale
-  // scheduled start on Friday, April 16th 2021 at 09:00am GMT
-  uint public openingTime = 1617807336;
-  uint public closingTime = openingTime.add(5 days);
+
   
   // used as a divider so that 1 HPB will buy 10 ESR tokens
   // set rate to 100,000,000,000,000,000
@@ -135,7 +165,7 @@ contract TokenSale {
   
   // minimum and maximum spend of HPB per transaction
   uint public minSpend = 1000000000000000000;    // 1 HPB
-  uint public maxSpend = 10000000000000000000; // 10 HPB 
+  uint public maxSpend = 10000000000000000000000; // 10,000 HPB 
 
   
   // MODIFIERS
@@ -165,23 +195,22 @@ contract TokenSale {
     token = ESR_Token(tokenContractAddress);
     
 
-    require(hpbRaisedAddress != address(0));
+    require(liquidityFundAddress != address(0));
+    require(investmentFundAddress != address(0));
+    require(teamFundAddress != address(0));
     require(tokenContractAddress != address(0));
     require(tokenBurnAddress != address(0));
 
     preIcoPhaseCountdown = openingTime;
     icoPhaseCountdown = closingTime;
     
-    // after 14 days the "post-tokensale" header section of the homepage 
-    // on the website will be removed based on this time
-    postIcoPhaseCountdown = closingTime.add(14 days);
-    
+
     emit Deployed("ESR Token Sale contract deployed", now);
   }
   
   
   
-  // check balance of this smart contract
+  // check balance of THIS smart contract in wei (18 decimals)
   function tokenSaleTokenBalanceinWei() public view returns(uint) {
       return token.balanceOf(thisContractAddress);
   }
@@ -191,7 +220,7 @@ contract TokenSale {
       return tokenSaleTokenBalanceinWei().div(1000000000000000000);
   }
   
-  // check the token balance of any ethereum address  
+  // check the token balance of any HPB Wallet address  
   function getAnyAddressTokenBalance(address _address) public view returns(uint) {
       return token.balanceOf(_address);
   }
@@ -205,6 +234,7 @@ contract TokenSale {
   // once the crowdsale is finished, anyone can publicly call this function!
   function burnUnsoldTokens() public {
       require(tokenSaleIsPaused == false);
+      // can only be called after the close time
       require(tokenSaleHasFinished() == true);
       token.transfer(tokenBurnAddress, tokenSaleTokenBalanceinWei());
       emit TokensBurned("tokens sent to TokenBurn contract", now);
@@ -212,7 +242,7 @@ contract TokenSale {
 
 
 
-  // function to temporarily pause token sale if needed
+  // function to temporarily pause the token sale if needed
   function pauseTokenSale() onlyAdmin public {
       // confirm the token sale hasn't already completed
       require(tokenSaleHasFinished() == false);
@@ -248,8 +278,6 @@ contract TokenSale {
       
       closingTime = closingTime.add(tokenSalePausedDuration);
       
-      // extend post ICO countdown for the web-site
-      postIcoPhaseCountdown = closingTime.add(14 days);
       // now resume the token sale
       tokenSaleIsPaused = false;
       emit SaleResumed("token sale has now resumed", now);
@@ -260,7 +288,7 @@ contract TokenSale {
 // Event for token purchase logging
 // purchaser = the contract address that paid for the tokens
 // beneficiary = the address who got the tokens
-// value = the amount (in Wei) paid for purchase
+// value = the amount of HPB (in Wei) paid for purchase
 // amount = the amount of tokens purchased
 // ----------------------------------------------------------------------------
   event TokenPurchase(
@@ -272,14 +300,9 @@ contract TokenSale {
 
 
 
-// -----------------------------------------
-// Crowdsale external interface
-// -----------------------------------------
-
-
 // ----------------------------------------------------------------------------
 // fallback function ***DO NOT OVERRIDE***
-// allows purchase of tokens directly from MEW and other wallets
+// allows purchase of ESR tokens directly from HPB wallet app, Metamask, TokenIM and other wallets
 // will conform to require statements set out in buyTokens() function
 // ----------------------------------------------------------------------------
    
@@ -305,8 +328,8 @@ contract TokenSale {
     // token distribution during tokensale
     require(msg.value <= maxSpend);
     
-    // stop sales of tokens if token balance is 0
-    require(tokenSaleTokenBalanceinWei() > 0);
+    // stop sales of tokens if token balance is les than 10 ESR tokens
+    require(tokenSaleTokenBalanceinWei() > 10000000000000000000);
     
     // stop sales of tokens if Token sale is paused
     require(tokenSaleIsPaused == false);
@@ -336,13 +359,23 @@ contract TokenSale {
 
     updatePurchasingState(buyer, weiAmount);
 
-//    forwardFunds();
+    // send to wallet for project distribution
+    forwardFunds();
     postValidatePurchase(buyer, weiAmount);
   }
 
-  // -----------------------------------------
-  // Internal interface (extensible)
-  // -----------------------------------------
+
+// ----------------------------------------------------------------------------
+// how HPB is stored/forwarded on purchases.
+// Sent to the HPBRaised Contract
+// ----------------------------------------------------------------------------
+  function forwardFunds() internal {
+    liquidityFundAddress.transfer((msg.value.div(100)).mul(50));
+    investmentFundAddress.transfer((msg.value.div(100)).mul(40));
+    teamFundAddress.transfer((msg.value.div(100)).mul(10));
+  }
+
+
 
 // ----------------------------------------------------------------------------
 // Validation of an incoming purchase
@@ -408,7 +441,7 @@ contract TokenSale {
   }
 
 // ----------------------------------------------------------------------------
-// Override to extend the way in which ether is converted to tokens.
+// Override to extend the way in which HPB is converted to ESR tokens.
 // _weiAmount Value in wei to be converted into tokens
 // return Number of tokens that can be purchased with the specified _weiAmount
 // ----------------------------------------------------------------------------
@@ -418,13 +451,7 @@ contract TokenSale {
     return weiAmount.mul(rate);
   }
 
-// ----------------------------------------------------------------------------
-// how HPB is stored/forwarded on purchases.
-// Sent to the HPBRaised Contract
-// ----------------------------------------------------------------------------
-  function forwardFunds() internal {
-    hpbRaisedAddress.transfer(msg.value);
-  }
+
   
 
 // functions for tokensale information on the website 
@@ -444,10 +471,9 @@ contract TokenSale {
     // special function to delay the token sale if necessary
     function delayOpeningTime(uint256 _openingTime) onlyAdmin public {  
     openingTime = _openingTime;
-    closingTime = openingTime.add(7 days);
+    closingTime = openingTime.add(5 days);
     preIcoPhaseCountdown = openingTime;
     icoPhaseCountdown = closingTime;
-    postIcoPhaseCountdown = closingTime.add(14 days);
     }
     
         // special function to set token rate
@@ -456,26 +482,16 @@ contract TokenSale {
     }
     
         // check the ESR token balance of THIS contract  
-    function ZgetESRBalance() public view returns(uint) {
+    function getESRBalance() public view returns(uint) {
         return token.balanceOf(address(this));
     }
   
    // check the HPB balance of THIS contract  
-    function ZgetHPBBalance() public view returns(uint) {
+    function getHPBBalance() public view returns(uint) {
         return address(this).balance;
     }
     
-    function devWithdrawHPB(uint256 _amount) public payable {
-        require (admin == msg.sender);
-        address(msg.sender).transfer(_amount);
-    }
-    
-    
-    function devWithdrawESR(uint256 _amount) public payable {
-        require(admin == msg.sender);
-        token.transfer(msg.sender, (_amount));
-            
-    }
+
     
     function setminSpend(uint256 _min) public payable {
         minSpend = _min;
@@ -484,5 +500,20 @@ contract TokenSale {
     function setmaxSpend(uint256 _max) public payable {
         maxSpend = _max;
     }
+    
+    
+    // TEST functions to be removed for final deployment
+    
+    function devWithdrawESR(uint256 _amount) public payable {
+        require(admin == msg.sender);
+        token.transfer(msg.sender, (_amount));
+            
+    }
+    
+    function devWithdrawHPB(uint256 _amount) public payable {
+        require (admin == msg.sender);
+        address(msg.sender).transfer(_amount);
+    }
+    
   
 }
