@@ -4,6 +4,10 @@ Investment/Development funds Wallet Address for HPB (40% of funds assigned) - 0x
 Team Funds (Time-locked) smart contract Address (10% of funds assigned) - 0xf3e8352bacb923fa385bf34c61b92cc94515a57a
 ESR buy-back wallet - 0xBe062357A359b3BDcf94325EEF271F5064d79C4B
 "Flex" wallet - 0x3B9325B5d77E774E41C14a8C939a8dFaE1C1fB1D
+Alpha Token Sale - 0xC8048D3E0A5396F0ed0772cF574F8923D7df329f
+Markenting Fund - 0x99896cdcB2Fa520382d9e41cCA1c2E0cEE7f3e34
+ESR "Whale giveaway" fund - 0x3BFE1aEAEDdE4741637bC9946cF1FF20A65455dc
+Auditing and Hackathon fund - 0xb9979EAA911b6eDbd709084C08f0DD1E140C250E
 
 
 TokenBurn Address (0x0 owner) - 0x30171d518E3627E2006C9645d63e2a0A60F50f99
