@@ -2,7 +2,8 @@ Token Sale Smart Contract Address - 0xebcd446644647ec8a9c8eff1c79b7a8629bcbfdf
 CEX/DEX liquidity pool Address for HPB and ESR (50% of funds assigned) - 0xFF3c2E48dE1C8801337a16fE7944b4b5Df20A2cC
 Investment/Development funds Wallet Address for HPB (40% of funds assigned) - 0x4053284F7bA7Ac7DF52DBBc12b42e6Fa2956Bba1
 Team Funds (Time-locked) smart contract Address (10% of funds assigned) - 0xf3e8352bacb923fa385bf34c61b92cc94515a57a
-
+ESR buy-back wallet - 0xBe062357A359b3BDcf94325EEF271F5064d79C4B
+"Flex" wallet - 0x3B9325B5d77E774E41C14a8C939a8dFaE1C1fB1D
 
 
 TokenBurn Address (0x0 owner) - 0x30171d518E3627E2006C9645d63e2a0A60F50f99
