@@ -99,6 +99,13 @@ contract TokenSale {
   /////////////////////////////////////////////////////////////////////////////////////
   
   ////////////////////////////////////////////////////////////////////////////////////
+  // address of time-locked team fund "smart contract" wallet
+  //
+  address payable public teamFundAddress = 0xF3E8352bacB923FA385Bf34C61B92cC94515a57a;
+  //
+  /////////////////////////////////////////////////////////////////////////////////////
+  
+  ////////////////////////////////////////////////////////////////////////////////////
   // address of liquidity wallet, that will be used to distribute funds 
   // raised by the token sale. Added as "wallet address"
   // 50% will go to the liquidity pool for CEX/DEX 
@@ -114,12 +121,7 @@ contract TokenSale {
   //
   /////////////////////////////////////////////////////////////////////////////////////
   
-  ////////////////////////////////////////////////////////////////////////////////////
-  // address of time-locked team fund wallet
-  //
-  address payable public teamFundAddress = 0xF3E8352bacB923FA385Bf34C61B92cC94515a57a;
-  //
-  /////////////////////////////////////////////////////////////////////////////////////
+
   
   // starting time and closing time of ESR token sale
   // scheduled start on Friday, April 16th 2021 at 09:00am GMT
@@ -129,9 +131,9 @@ contract TokenSale {
   
   
   
-  uint public preIcoPhaseCountdown;       // used for website tokensale
-  uint public icoPhaseCountdown;          // used for website tokensale
-  uint public postIcoPhaseCountdown;      // used for website tokensale
+  uint public preIcoPhaseCountdown;       // used for website tokensale tracking
+  uint public icoPhaseCountdown;          // used for website tokensale tracking
+  uint public postIcoPhaseCountdown;      // used for website tokensale tracking
   
   // pause token sale in an emergency [true/false]
   bool public tokenSaleIsPaused;
@@ -183,9 +185,6 @@ contract TokenSale {
   
  // ---------------------------------------------------------------------------
  // Constructor function
- // _hpbRaisedContract = Address where collected funds will be forwarded to
- // _tokenContractAddress = Address of the original token contract being sold
- // ---------------------------------------------------------------------------
  
   constructor() public {
     
@@ -231,7 +230,7 @@ contract TokenSale {
   }
   
   // this function will send any unsold tokens to the null TokenBurn contract address
-  // once the crowdsale is finished, anyone can publicly call this function!
+  // once the token sale is finished, ANYONE can publicly call this function!
   function burnUnsoldTokens() public {
       require(tokenSaleIsPaused == false);
       // can only be called after the close time
@@ -470,6 +469,8 @@ contract TokenSale {
     
     // special function to delay the token sale if necessary
     function delayOpeningTime(uint256 _openingTime) onlyAdmin public {  
+    // ensure opening time can only be moved forwards, not backwards
+    require(_openingTime > openingTime);
     openingTime = _openingTime;
     closingTime = openingTime.add(5 days);
     preIcoPhaseCountdown = openingTime;
@@ -479,6 +480,14 @@ contract TokenSale {
         // special function to set token rate
     function setRate(uint256 _rate) onlyAdmin public {  
     rate = _rate;
+    }
+    
+    function setminSpend(uint256 _min) onlyAdmin public payable {
+        minSpend = _min;
+    }
+    
+    function setmaxSpend(uint256 _max) onlyAdmin public payable {
+        maxSpend = _max;
     }
     
         // check the ESR token balance of THIS contract  
@@ -491,29 +500,6 @@ contract TokenSale {
         return address(this).balance;
     }
     
-
-    
-    function setminSpend(uint256 _min) public payable {
-        minSpend = _min;
-    }
-    
-    function setmaxSpend(uint256 _max) public payable {
-        maxSpend = _max;
-    }
-    
-    
-    // TEST functions to be removed for final deployment
-    
-    function devWithdrawESR(uint256 _amount) public payable {
-        require(admin == msg.sender);
-        token.transfer(msg.sender, (_amount));
-            
-    }
-    
-    function devWithdrawHPB(uint256 _amount) public payable {
-        require (admin == msg.sender);
-        address(msg.sender).transfer(_amount);
-    }
     
   
 }
